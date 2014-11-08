@@ -388,9 +388,9 @@ func (c *Context) GetSampleRate() (rate int) {
 
 // Enable test mode that returns an 8 bit counter instead of the samples.
 // The counter is generated inside the RTL2832.
-func (c *Context) SetTestMode(testMode bool) (err error) {
+func (c *Context) SetTestMode(enable bool) (err error) {
 	mode := 0
-	if !testMode {
+	if enable {
 		mode = 1
 	}
 	i := int(C.rtlsdr_set_testmode((*C.rtlsdr_dev_t)(c.dev),
@@ -399,9 +399,9 @@ func (c *Context) SetTestMode(testMode bool) (err error) {
 }
 
 // Enable or disable the internal digital AGC of the RTL2832.
-func (c *Context) SetAgcMode(AGCMode bool) (err error) {
+func (c *Context) SetAgcMode(enable bool) (err error) {
 	mode := 0
-	if !AGCMode {
+	if enable {
 		mode = 1
 	}
 	i := int(C.rtlsdr_set_agc_mode((*C.rtlsdr_dev_t)(c.dev),
@@ -443,9 +443,9 @@ func (c *Context) GetDirectSampling() (mode SamplingMode, err error) {
 // Enable or disable offset tuning for zero-IF tuners, which allows to avoid
 // problems caused by the DC offset of the ADCs and 1/f noise.
 func (c *Context) SetOffsetTuning(enable bool) (err error) {
-	mode := 1
-	if !enable {
-		mode = 0
+	mode := 0
+	if enable {
+		mode = 1
 	}
 	i := int(C.rtlsdr_set_offset_tuning((*C.rtlsdr_dev_t)(c.dev), C.int(mode)))
 	return libusbError(i)
@@ -459,10 +459,8 @@ func (c *Context) GetOffsetTuning() (enabled bool, err error) {
 		err = errors.New("error getting offset tuning mode")
 	case 0:
 		enabled = false
-		err = nil
 	case 1:
 		enabled = true
-		err = nil
 	default:
 		err = errors.New("unknown offset tuning mode state")
 	}
